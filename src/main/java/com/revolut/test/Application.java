@@ -1,10 +1,11 @@
 package com.revolut.test;
 
-import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.revolut.test.config.RestConfig;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.glassfish.jersey.servlet.ServletContainer;
 
 public class Application {
 
@@ -27,8 +28,7 @@ public class Application {
     private static ServletHolder getRestServlet() {
         ServletHolder holder = new ServletHolder();
         holder.setServlet(new ServletContainer());
-        holder.setInitParameter("com.sun.jersey.config.property.packages", "com.revolut.test.rest");
-        holder.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
+        holder.setInitParameter("javax.ws.rs.Application", RestConfig.class.getName());
         return holder;
     }
 
