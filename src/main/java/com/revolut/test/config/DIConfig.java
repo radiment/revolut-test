@@ -30,6 +30,8 @@ public class DIConfig extends AbstractModule {
                 bindTransactionFactoryType(JdbcTransactionFactory.class);
                 addMapperClass(AccountMapper.class);
 
+                mapUnderscoreToCamelCase(true);
+
                 Names.bindProperties(binder(), getApplicationProperties());
             }
         });

@@ -5,6 +5,7 @@ import com.revolut.test.services.AccountService;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -38,5 +39,11 @@ public class AccountController {
     @Path("/users/{userId}/income")
     public Account income(@PathParam("userId") Long userId, Account account) {
         return accountService.income(userId, account);
+    }
+
+    @POST
+    @Path("/users/{userId}/withdraw")
+    public Account withdraw(@PathParam("userId") Long userId, Account account) {
+        return accountService.withdraw(userId, account);
     }
 }
