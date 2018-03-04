@@ -26,4 +26,7 @@ public interface AccountMapper {
 
     @Update("UPDATE account set value = #{value}, version = version + 1 WHERE id = #{id} and version = #{version}")
     boolean updateAccountValue(Account account);
+
+    @Select("select * from account a where a.user_id = #{userId}")
+    List<Account> getAccountsByUser(@Param("userId") Long userId);
 }

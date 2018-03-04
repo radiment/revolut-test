@@ -96,4 +96,8 @@ public class AccountService {
         ccCheck(accountMapper.updateAccountValue(from));
         ccCheck(accountMapper.updateAccountValue(to));
     }
+
+    public List<Account> getAccountsForUser(Long userId) {
+        return accountMapper.getAccountsByUser(userId);
+    }
 }

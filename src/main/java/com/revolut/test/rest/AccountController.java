@@ -1,14 +1,12 @@
 package com.revolut.test.rest;
 
 import com.revolut.test.dto.Account;
-import com.revolut.test.dto.Message;
 import com.revolut.test.dto.Transfer;
 import com.revolut.test.services.AccountService;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -33,6 +31,12 @@ public class AccountController {
     }
 
     @GET
+    @Path("/users/{userId}")
+    public List<Account> getAccountsForUser(@PathParam("userId") Long userId) {
+        return accountService.getAccountsForUser(userId);
+    }
+
+    @GET
     @Path("/{id}")
     public Account getAccount(@PathParam("id") Long id) {
         return accountService.getAccount(id);
@@ -52,8 +56,8 @@ public class AccountController {
 
     @POST
     @Path("/transfers")
-    public Message transfer(Transfer transfer) {
+    public String transfer(Transfer transfer) {
         accountService.transfer(transfer);
-        return new Message();
+        return "Transfer successful";
     }
 }
