@@ -1,8 +1,8 @@
 package com.revolut.test.rest.exception;
 
-import com.revolut.test.exception.AccountException;
-import com.revolut.test.exception.ErrorCode;
-import com.revolut.test.exception.ErrorMessage;
+import com.revolut.test.services.exception.AccountException;
+import com.revolut.test.services.exception.ErrorCode;
+import com.revolut.test.services.exception.ErrorMessage;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.ws.rs.core.MediaType;

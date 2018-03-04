@@ -1,9 +1,12 @@
 package com.revolut.test.rest;
 
 import com.revolut.test.dto.Account;
+import com.revolut.test.dto.Message;
+import com.revolut.test.dto.Transfer;
 import com.revolut.test.services.AccountService;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -37,13 +40,20 @@ public class AccountController {
 
     @POST
     @Path("/users/{userId}/income")
-    public Account income(@PathParam("userId") Long userId, Account account) {
+    public Account income(@PathParam("userId") Long userId, @Valid Account account) {
         return accountService.income(userId, account);
     }
 
     @POST
     @Path("/users/{userId}/withdraw")
-    public Account withdraw(@PathParam("userId") Long userId, Account account) {
+    public Account withdraw(@PathParam("userId") Long userId, @Valid Account account) {
         return accountService.withdraw(userId, account);
+    }
+
+    @POST
+    @Path("/transfers")
+    public Message transfer(Transfer transfer) {
+        accountService.transfer(transfer);
+        return new Message();
     }
 }

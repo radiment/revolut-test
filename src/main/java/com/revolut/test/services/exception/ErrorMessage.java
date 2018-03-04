@@ -1,15 +1,16 @@
-package com.revolut.test.exception;
+package com.revolut.test.services.exception;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 @Getter
-public class ErrorMessage {
+public class ErrorMessage implements Serializable {
     private final ServiceError serviceError;
-    private final Object[] params;
+    private final Serializable[] params;
 
-    public ErrorMessage(ServiceError serviceError, Object... params) {
+    public ErrorMessage(ServiceError serviceError, Serializable... params) {
         this.serviceError = serviceError;
         this.params = params;
     }

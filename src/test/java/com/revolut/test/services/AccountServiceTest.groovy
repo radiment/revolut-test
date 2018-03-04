@@ -1,15 +1,18 @@
 package com.revolut.test.services
 
 import com.revolut.test.dto.Account
-import com.revolut.test.exception.AccountException
-import com.revolut.test.exception.ErrorCode
+import com.revolut.test.dto.Transfer
+import com.revolut.test.services.exception.AccountException
+import com.revolut.test.services.exception.ErrorCode
 import com.revolut.test.mapper.AccountMapper
 import spock.lang.Specification
 
 class AccountServiceTest extends Specification {
 
     public static final int CURRENCY_ID = 810
-    public static final int USER_ID = 1
+    public static final int USER1 = 1
+    public static final int USER2 = 2
+
     AccountService accountService
     AccountMapper accountMapper
 
@@ -21,9 +24,9 @@ class AccountServiceTest extends Specification {
     def "getAllAccounts returns all accounts"() {
         given: "list with 2 accounts of one user and one for another"
         def accounts = [
-                new Account(1, 1, 200, CURRENCY_ID),
-                new Account(2, 1, 300, 800),
-                new Account(3, 2, 100, CURRENCY_ID)
+                new Account(1, USER1, CURRENCY_ID, 200),
+                new Account(2, USER1, 800, 300),
+                new Account(3, USER2, CURRENCY_ID, 100)
         ]
         and: "account mapper always return this accounts on getAllAccounts"
         accountMapper.getAllAccounts() >> accounts
@@ -37,7 +40,7 @@ class AccountServiceTest extends Specification {
 
     def "getAccount returns exact account"() {
         given: "some account"
-        def account = new Account(1, 1, 200, CURRENCY_ID)
+        def account = new Account(1, 1, CURRENCY_ID, 200)
 
         and: "accountMapper return this account by his id"
         accountMapper.getAccountById(account.getId()) >> account
@@ -86,25 +89,25 @@ class AccountServiceTest extends Specification {
         def result = accountService.income(userId, income)
 
         then:
-        result == new Account(accountId, userId, income.value, income.currencyId)
+        result == new Account(accountId, userId, income.currencyId, income.value)
     }
 
     def "income add money to the existed account"() {
         given:
-        def userId = USER_ID
-        def existed = new Account(1, userId, 100, CURRENCY_ID)
+        def userId = USER1
+        def existed = new Account(1, userId, CURRENCY_ID, 100)
         def income = new Account(value: 50, currencyId: CURRENCY_ID)
-        def expected = new Account(1, userId, 150, CURRENCY_ID)
+        def expected = new Account(1, userId, CURRENCY_ID, 150)
 
         and:
-        accountMapper.getAccountByUserIdAndCurrencyId(userId, CURRENCY_ID) >> existed
+        accountMapper.getAccountByUserAndCurrency(userId, CURRENCY_ID) >> existed
 
         when:
         def result = accountService.income(userId, income)
 
         then:
         result == expected
-        1 * accountMapper.updateAccountValue(expected)
+        1 * accountMapper.updateAccountValue(expected) >> true
     }
 
     def "withdraw throws exception when account not found or not enough money"(Account existed) {
@@ -112,10 +115,10 @@ class AccountServiceTest extends Specification {
         def withdrawal = new Account(value: 200, currencyId: CURRENCY_ID)
 
         and:
-        accountMapper.getAccountByUserIdAndCurrencyId(USER_ID, CURRENCY_ID) >> existed
+        accountMapper.getAccountByUserAndCurrency(USER1, CURRENCY_ID) >> existed
 
         when:
-        accountService.withdraw(USER_ID, withdrawal)
+        accountService.withdraw(USER1, withdrawal)
 
         then:
         def ex = thrown(AccountException)
@@ -123,25 +126,26 @@ class AccountServiceTest extends Specification {
 
         where:
         existed << [null,
-                    new Account(1, USER_ID, 100, CURRENCY_ID),
-                    new Account(1, USER_ID, 199.99, CURRENCY_ID)]
+                    new Account(1, USER1, CURRENCY_ID, 100),
+                    new Account(1, USER1, CURRENCY_ID, 199.99)]
 
     }
 
     def "withdraw subtracts value if enough money"(BigDecimal withdrawalValue, BigDecimal expectedValue) {
         given:
-        def existed = new Account(1, USER_ID, 200, CURRENCY_ID)
+        def existed = new Account(1, USER1, CURRENCY_ID, 200)
+        def expected = new Account(1, USER1, CURRENCY_ID, expectedValue)
         def withdrawal = new Account(value: withdrawalValue, currencyId: CURRENCY_ID)
 
         and:
-        accountMapper.getAccountByUserIdAndCurrencyId(USER_ID, CURRENCY_ID) >> existed
+        accountMapper.getAccountByUserAndCurrency(USER1, CURRENCY_ID) >> existed
 
         when:
-        def result = accountService.withdraw(USER_ID, withdrawal)
+        def result = accountService.withdraw(USER1, withdrawal)
 
         then:
-        result.value == expectedValue
-        1 * accountMapper.updateAccountValue(new Account(existed.id, existed.userId, expectedValue, existed.currencyId))
+        result == expected
+        1 * accountMapper.updateAccountValue(expected) >> true
 
         where:
         withdrawalValue | expectedValue
@@ -150,5 +154,75 @@ class AccountServiceTest extends Specification {
         200             | 0
         150             | 50
         199.99          | 0.01
+    }
+
+    def "transfer failed when not enough money"(Account from) {
+        given:
+        def transfer = new Transfer(USER1, USER2, CURRENCY_ID, 200)
+
+        and:
+        accountMapper.getAccountByUserAndCurrency(USER1, CURRENCY_ID) >> from
+
+        when:
+        accountService.transfer(transfer)
+
+        then:
+        def ex = thrown(AccountException)
+        ex.errorMessage.serviceError == ErrorCode.NOT_ENOUGH_MONEY
+
+        where:
+        from << [null,
+                 new Account(1, USER1, CURRENCY_ID, 100),
+                 new Account(1, USER1, CURRENCY_ID, 199.99)]
+    }
+
+    def "transfer create to account when to is null"() {
+        given:
+        def newId = 2
+        def transfer = new Transfer(USER1, USER2, CURRENCY_ID, 200)
+        def from = new Account(1, USER1, CURRENCY_ID, 300)
+        def fromExp = new Account(1, USER1, CURRENCY_ID, 100)
+        def toExp = new Account(newId, USER2, CURRENCY_ID, 200)
+
+        and:
+        accountMapper.getAccountByUserAndCurrency(USER1, CURRENCY_ID) >> from
+        accountMapper.getAccountByUserAndCurrency(USER2, CURRENCY_ID) >> null
+        1 * accountMapper.createAccount(new Account(null, USER2, CURRENCY_ID, 0)) >> newId
+
+        when:
+        accountService.transfer(transfer)
+
+        then:
+        1 * accountMapper.updateAccountValue(fromExp) >> true
+
+        1 * accountMapper.updateAccountValue(toExp) >> true
+    }
+
+    def "transfer successfull with updated"(BigDecimal transVal, BigDecimal fromVal, BigDecimal toVal,
+                                            BigDecimal fromExpVal, BigDecimal toExpVal) {
+        given:
+        def transfer = new Transfer(USER1, USER2, CURRENCY_ID, transVal)
+        def from = new Account(1, USER1, CURRENCY_ID, fromVal)
+        def fromExp = new Account(1, USER1, CURRENCY_ID, fromExpVal)
+        def to = new Account(2, USER2, CURRENCY_ID, toVal)
+        def toExp = new Account(2, USER2, CURRENCY_ID, toExpVal)
+
+        and:
+        accountMapper.getAccountByUserAndCurrency(USER1, CURRENCY_ID) >> from
+        accountMapper.getAccountByUserAndCurrency(USER2, CURRENCY_ID) >> to
+
+        when:
+        accountService.transfer(transfer)
+
+        then:
+        1 * accountMapper.updateAccountValue(fromExp) >> true
+        1 * accountMapper.updateAccountValue(toExp) >> true
+
+        where:
+        transVal | fromVal | toVal | fromExpVal | toExpVal
+        100      | 300     | 0     | 200        | 100
+        100      | 300     | 300   | 200        | 400
+        300      | 300     | 100   | 0          | 400
+        199.99   | 200     | 0.01  | 0.01       | 200.00
     }
 }

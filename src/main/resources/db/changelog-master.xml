@@ -20,4 +20,6 @@
         </createTable>
         <addUniqueConstraint tableName="account" columnNames="user_id, currency_id"/>
     </changeSet>
+
+    <includeAll path="change/" relativeToChangelogFile="true"/>
 </databaseChangeLog>

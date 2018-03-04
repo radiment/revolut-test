@@ -12,9 +12,9 @@ import java.util.List;
 public interface AccountMapper {
 
     @Select("select * from account a where a.user_id = #{userId} and a.currency_id = #{currencyId}")
-    Account getAccountByUserIdAndCurrencyId(@Param("userId") Long userId, @Param("currencyId") int currencyId);
+    Account getAccountByUserAndCurrency(@Param("userId") Long userId, @Param("currencyId") int currencyId);
 
-    @Insert("insert into account (user_id, currency_id, value) VALUES (#{userId}, #{currencyId}, #{value})")
+    @Insert("insert into account (user_id, currency_id, value, version) VALUES (#{userId}, #{currencyId}, #{value}, #{version})")
     @SelectKey(statement="call identity()", keyProperty="id", before=false, resultType=Long.class)
     Long createAccount(Account newAccount);
 
@@ -24,6 +24,6 @@ public interface AccountMapper {
     @Select("SELECT * FROM account where id = #{id}")
     Account getAccountById(@Param("id") Long id);
 
-    @Update("UPDATE account set value = #{value} WHERE id = #{id}")
-    void updateAccountValue(Account account);
+    @Update("UPDATE account set value = #{value}, version = version + 1 WHERE id = #{id} and version = #{version}")
+    boolean updateAccountValue(Account account);
 }

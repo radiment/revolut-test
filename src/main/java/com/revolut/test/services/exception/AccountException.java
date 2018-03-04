@@ -1,14 +1,16 @@
-package com.revolut.test.exception;
+package com.revolut.test.services.exception;
+
+import java.io.Serializable;
 
 public class AccountException extends RuntimeException {
 
     private final ErrorMessage errorMessage;
 
-    public AccountException(ServiceError serviceError, Object... params) {
+    public AccountException(ServiceError serviceError, Serializable... params) {
         this.errorMessage = new ErrorMessage(serviceError, params);
     }
 
-    public AccountException(Throwable cause, ServiceError serviceError, Object... params) {
+    public AccountException(Throwable cause, ServiceError serviceError, Serializable... params) {
         super(cause);
         this.errorMessage = new ErrorMessage(serviceError, params);
     }

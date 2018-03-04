@@ -1,7 +1,7 @@
 package com.revolut.test.rest.exception
 
-import com.revolut.test.exception.ErrorCode
-import com.revolut.test.exception.ServiceError
+import com.revolut.test.services.exception.ErrorCode
+import com.revolut.test.services.exception.ServiceError
 import spock.lang.Specification
 
 import javax.ws.rs.core.Response.Status
