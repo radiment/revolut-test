@@ -1,5 +1,5 @@
 group 'com.revolut.test'
-version '0.1-SNAPSHOT'
+version '0.9-SNAPSHOT'
 
 buildscript {
     repositories {
@@ -8,17 +8,24 @@ buildscript {
         }
     }
 
+//    dependencies {
+//        classpath "io.franzbecker:gradle-lombok:1.11"
+//    }
+
     dependencies {
-        classpath "io.franzbecker:gradle-lombok:1.11"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.2'
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'idea'
-apply plugin: 'io.franzbecker.gradle-lombok'
+apply plugin: 'application'
+//apply plugin: 'io.franzbecker.gradle-lombok'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = 1.8
+mainClassName = 'com.revolut.test.Application'
 def jersey_version = '2.26'
 
 repositories {
@@ -28,26 +35,30 @@ repositories {
     }
 }
 
+shadowJar {
+    baseName = 'accounting'
+    classifier = null
+    version = null
+}
+
 dependencies {
+
+    compileOnly "org.projectlombok:lombok:1.16.16"
 
     compile 'org.apache.logging.log4j:log4j-core:2.5'
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.5'
     compile 'org.eclipse.jetty:jetty-servlet:9.4.8.v20171121'
     compile "org.glassfish.jersey.containers:jersey-container-servlet:$jersey_version"
-//    compile "com.squarespace.jersey2-guice:jersey2-guice-impl:1.0.6"
     compile "org.glassfish.jersey.inject:jersey-hk2:$jersey_version"
+    compile "org.glassfish.jersey.media:jersey-media-json-jackson:$jersey_version"
     compile "org.glassfish.hk2:guice-bridge:2.5.0-b61"
     compile "com.google.inject.extensions:guice-servlet:4.2.0"
-    compile "org.glassfish.jersey.media:jersey-media-json-jackson:$jersey_version"
-    compile 'org.javamoney:moneta:1.1'
 
     compile 'com.h2database:h2:1.4.196'
     compile 'org.liquibase:liquibase-core:3.5.4'
     compile 'pl.coffeepower:guice-liquibase:0.0.2'
     compile 'org.mybatis:mybatis:3.4.5'
     compile 'org.mybatis:mybatis-guice:3.10'
-
-//    compile "com.google.inject:guice:3.0"
 
     testCompile 'org.mockito:mockito-all:1.9.5'
     testCompile 'org.codehaus.groovy:groovy-all:2.4.13'
