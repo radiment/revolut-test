@@ -83,7 +83,7 @@ class AccountServiceTest extends Specification {
         def income = new Account(value: 100, currencyId: CURRENCY_ID)
 
         and:
-        1 * accountMapper.createAccount(_ as Account) >> 10
+        1 * accountMapper.createAccount(_ as Account) >> { Account account -> account.setId(accountId); return 1 }
 
         when:
         def result = accountService.income(userId, income)
@@ -187,7 +187,7 @@ class AccountServiceTest extends Specification {
         and:
         accountMapper.getAccountByUserAndCurrency(USER1, CURRENCY_ID) >> from
         accountMapper.getAccountByUserAndCurrency(USER2, CURRENCY_ID) >> null
-        1 * accountMapper.createAccount(new Account(null, USER2, CURRENCY_ID, 0)) >> newId
+        1 * accountMapper.createAccount(new Account(null, USER2, CURRENCY_ID, 0)) >> { Account account -> account.setId(newId); return 1 }
 
         when:
         accountService.transfer(transfer)
