@@ -1,7 +1,8 @@
-package com.revolut.test.services
+package com.com.revolut.test.services
 
 import com.revolut.test.dto.Account
 import com.revolut.test.dto.Transfer
+import com.revolut.test.services.AccountService
 import com.revolut.test.services.exception.AccountException
 import com.revolut.test.services.exception.ErrorCode
 import com.revolut.test.mapper.AccountMapper

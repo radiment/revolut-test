@@ -1,12 +1,10 @@
-package com.revolut.test.services
+package com.com.revolut.test.services
 
 import com.revolut.test.server.JettyServer
 import groovyx.net.http.RESTClient
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
-
-import java.util.concurrent.Executors
 
 import static com.revolut.test.services.exception.ErrorCode.NOT_ENOUGH_MONEY
 import static groovyx.net.http.ContentType.JSON

@@ -1,5 +1,6 @@
-package com.revolut.test.rest.exception
+package com.com.revolut.test.rest.exception
 
+import com.revolut.test.rest.exception.ErrorStatuses
 import com.revolut.test.services.exception.ErrorCode
 import com.revolut.test.services.exception.ServiceError
 import spock.lang.Specification

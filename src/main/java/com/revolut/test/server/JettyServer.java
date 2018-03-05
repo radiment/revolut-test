@@ -9,9 +9,13 @@ import org.glassfish.jersey.servlet.ServletContainer;
 
 public class JettyServer {
 
-    public void start(int port) throws Exception {
-        Server server = new Server();
+    private final Server server;
 
+    public JettyServer() {
+        this.server = new Server();
+    }
+
+    public JettyServer start(int port) throws Exception {
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
         server.addConnector(connector);
@@ -22,6 +26,11 @@ public class JettyServer {
 
         server.setHandler(context);
         server.start();
+        return this;
+    }
+
+    public void join() throws InterruptedException {
+        server.join();
     }
 
     private static ServletHolder getRestServlet() {
