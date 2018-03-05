@@ -1,6 +1,7 @@
 package com.revolut.test.rest;
 
 import com.revolut.test.dto.Account;
+import com.revolut.test.dto.Info;
 import com.revolut.test.dto.Transfer;
 import com.revolut.test.services.AccountService;
 
@@ -56,8 +57,8 @@ public class AccountController {
 
     @POST
     @Path("/transfers")
-    public String transfer(Transfer transfer) {
+    public Info transfer(Transfer transfer) {
         accountService.transfer(transfer);
-        return "Transfer successful";
+        return new Info("Transfer successful");
     }
 }

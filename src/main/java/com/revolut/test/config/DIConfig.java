@@ -50,7 +50,9 @@ public class DIConfig extends AbstractModule {
     @Singleton
     @Provides public DataSource createDataSource() {
         JdbcDataSource ds = new JdbcDataSource();
-        ds.setURL("jdbc:h2:~/account");
+        //TODO make config
+//        ds.setURL("jdbc:h2:~/account");
+        ds.setURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE");
         ds.setUser("user");
         ds.setPassword("123");
         return ds;

@@ -2,9 +2,9 @@ package com.revolut.test.mapper;
 
 import com.revolut.test.dto.Account;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.SelectKey;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
@@ -15,8 +15,8 @@ public interface AccountMapper {
     Account getAccountByUserAndCurrency(@Param("userId") Long userId, @Param("currencyId") int currencyId);
 
     @Insert("insert into account (user_id, currency_id, value, version) VALUES (#{userId}, #{currencyId}, #{value}, #{version})")
-    @SelectKey(statement="call identity()", keyProperty="id", before=false, resultType=Long.class)
-    Long createAccount(Account newAccount);
+    @Options(useGeneratedKeys = true, keyColumn = "id")
+    int createAccount(Account newAccount);
 
     @Select("SELECT * FROM account")
     List<Account> getAllAccounts();

@@ -55,8 +55,7 @@ public class AccountService {
                 .userId(userId)
                 .currencyId(currencyId)
                 .value(value).build();
-        Long id = accountMapper.createAccount(newAccount);
-        newAccount.setId(id);
+        accountMapper.createAccount(newAccount);
         return newAccount;
     }
 

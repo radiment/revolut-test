@@ -10,6 +10,7 @@ import java.util.Map;
 import static com.revolut.test.services.exception.ErrorCode.CONCURRENT_CHANGE;
 import static com.revolut.test.services.exception.ErrorCode.INCOME_NOT_POSITIVE;
 import static com.revolut.test.services.exception.ErrorCode.INTERNAL_ERROR;
+import static com.revolut.test.services.exception.ErrorCode.NOT_ENOUGH_MONEY;
 import static com.revolut.test.services.exception.ErrorCode.NOT_FOUND;
 
 public class ErrorStatuses {
@@ -24,6 +25,7 @@ public class ErrorStatuses {
         st.put(NOT_FOUND, Status.NOT_FOUND);
         st.put(INTERNAL_ERROR, Status.INTERNAL_SERVER_ERROR);
         st.put(INCOME_NOT_POSITIVE, Status.BAD_REQUEST);
+        st.put(NOT_ENOUGH_MONEY, Status.BAD_REQUEST);
         st.put(CONCURRENT_CHANGE, Status.CONFLICT);
         statuses = Collections.unmodifiableMap(st);
     }
