@@ -28,9 +28,7 @@ class ITAccountService extends Specification {
     def accountId
 
     def setupSpec() {
-        //TODO fix it
-        Executors.newFixedThreadPool(1).execute({ new JettyServer().start(PORT) })
-        sleep(5000)
+        new JettyServer().start(PORT);
         client = new RESTClient("http://localhost:$PORT", JSON)
         client.handler.failure = client.handler.success
     }
